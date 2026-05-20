@@ -1,0 +1,53 @@
+cabal-version:       2.2
+
+name:                epub-reader
+version:             0.1.0.0
+-- synopsis:
+-- description:
+homepage:            https://github.com/zongpingding/epub-reader#readme
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              eureka
+maintainer:          zongpingding5@outlook.com
+copyright:           Copyright (c) 2025-2026 zongping ding
+category:            Web
+build-type:          Simple
+extra-source-files:  README.md
+                     CHANGELOG.md
+
+executable epub-reader
+  hs-source-dirs:      src
+  main-is:             Main.hs
+  other-modules:       Types
+                     , Utils
+                     , Config
+                     , Epub
+                     , UI
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5
+                     , haskell-gi-base
+                     , gi-gtk
+                     , gi-pango
+                     , gi-gio
+                     , gi-gdk
+                     , bytestring
+                     , zip-archive
+                     , tagsoup
+                     , containers
+                     , filepath
+                     , gi-glib
+                     , directory
+                     , text
+  ghc-options:         -Wall
+                       -Wcompat
+                       -Widentities
+                       -Wincomplete-record-updates
+                       -Wincomplete-uni-patterns
+                       -Wmissing-export-lists
+                       -Wmissing-home-modules
+                       -Wpartial-fields
+                       -Wredundant-constraints
+
+source-repository head
+  type:     git
+  location: https://github.com/zongpingding/epub-reader
