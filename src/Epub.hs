@@ -76,7 +76,7 @@ extractToc archive spine =
             let tags = parseTags content
                 go [] _ _ acc = reverse acc
                 go (TagOpen "navPoint" _ : ts) level currentTitle acc = go ts (level + 1) currentTitle acc
-                go (TagClose "navPoint" : ts) level currentTitle acc = go ts (max 1 (level - 1)) currentTitle acc
+                go (TagClose "navPoint" : ts) level currentTitle acc = go ts (max 0 (level - 1)) currentTitle acc
                 go (TagOpen "text" _ : ts) level _ acc =
                     let (inner, rest) = break (\case TagClose "text" -> True; _ -> False) ts
                         txt = cleanTitle (T.concat [t | TagText t <- inner])
@@ -134,17 +134,17 @@ escapePango t = T.replace "&" "&amp;" $ T.replace "<" "&lt;" $ T.replace ">" "&g
 htmlToPango :: [Tag T.Text] -> T.Text
 htmlToPango [] = ""
 htmlToPango (tag:tags) = case tag of
-    TagText t -> escapePango t <> htmlToPango tags
-    TagOpen "b"  _ -> "<b>" <> htmlToPango tags
-    TagOpen "strong" _ -> "<b>" <> htmlToPango tags
-    TagOpen "i"  _ -> "<i>" <> htmlToPango tags
-    TagOpen "em" _ -> "<i>" <> htmlToPango tags
-    TagClose "b"  -> "</b>" <> htmlToPango tags
-    TagClose "strong" -> "</b>" <> htmlToPango tags
-    TagClose "i"  -> "</i>" <> htmlToPango tags
-    TagClose "em" -> "</i>" <> htmlToPango tags
-    TagOpen "br" _ -> "\n" <> htmlToPango tags
-    TagOpen "br/" _ -> "\n" <> htmlToPango tags
+    TagText t          -> escapePango t <> htmlToPango tags
+    TagOpen "b"      _ -> "<b>"  <> htmlToPango tags
+    TagOpen "strong" _ -> "<b>"  <> htmlToPango tags
+    TagOpen "i"      _ -> "<i>"  <> htmlToPango tags
+    TagOpen "em"     _ -> "<i>"  <> htmlToPango tags
+    TagClose "b"       -> "</b>" <> htmlToPango tags
+    TagClose "strong"  -> "</b>" <> htmlToPango tags
+    TagClose "i"       -> "</i>" <> htmlToPango tags
+    TagClose "em"      -> "</i>" <> htmlToPango tags
+    TagOpen "br"     _ -> "\n"   <> htmlToPango tags
+    TagOpen "br/"    _ -> "\n"   <> htmlToPango tags
     _ -> htmlToPango tags
 
 toBlocks :: [Tag T.Text] -> [ContentBlock]
@@ -164,9 +164,9 @@ toBlocks tags = filter nonEmpty (buildBlocks tags)
             content = cleanTitle (htmlToPango inner)  
             markup = case t of
                 "h1" -> "<span size='xx-large' weight='bold'>" <> content <> "</span>"
-                "h2" -> "<span size='x-large' weight='bold'>" <> content <> "</span>"
-                "h3" -> "<span size='large' weight='bold'>" <> content <> "</span>"
-                _    -> "<span size='large' weight='bold'>" <> content <> "</span>"
+                "h2" -> "<span size='x-large'  weight='bold'>" <> content <> "</span>"
+                "h3" -> "<span size='large'    weight='bold'>" <> content <> "</span>"
+                _    -> "<span size='large'    weight='bold'>" <> content <> "</span>"
             next = drop 1 after
         in TextBlock markup : buildBlocks next
         
@@ -184,7 +184,6 @@ toBlocks tags = filter nonEmpty (buildBlocks tags)
                               _ -> rest
         in TextBlock content : buildBlocks droppedRest
 
--- | Expose chapter content Placeholder
 getChapterBlocks :: Zip.Archive -> FilePath -> [ContentBlock]
 getChapterBlocks archive path =
     let rawHtml = getZipEntryContent archive path
